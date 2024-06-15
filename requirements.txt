@@ -1,0 +1,16 @@
+langchain
+transformers
+huggingface_hub
+unstructured[local-inference]
+sentence-transformers
+faiss-cpu
+accelerate
+bitsandbytes
+langchainhub
+langchain-openai
+peft
+gradio
+embedchain
+streamlit
+dotenv
+sentence-transformers
