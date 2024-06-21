@@ -1,5 +1,45 @@
 ## ClassDef CodeLoader
-Doc is waiting to be generated...
+ **CodeLoader**: The function of CodeLoader is to load and summarize code files from a repository.
+
+**attributes**: The attributes of this Class.
+· summaries: A dictionary to store summaries of code files.
+· extensions: A list of file extensions to consider for loading. Default is ['.py'].
+· model: The model used for generating summaries and documentation.
+· summarize_prompt: A prompt template for generating summaries of code files.
+· example_prompt: A prompt template for generating documentation pages for code examples.
+
+**Code Description**: The CodeLoader class is designed to load and summarize code files from a repository. It inherits from JSONSerializable, indicating that instances of this class can be serialized to JSON. The class initializes with a model, optional extensions for file types to consider, and optional summaries. If no extensions are provided, it defaults to ['.py']. If no summaries are provided, it initializes an empty dictionary.
+
+The summarize_prompt and example_prompt attributes are string templates used for generating summaries and documentation pages, respectively. These templates include placeholders for file content and source path, ensuring that the generated summaries and documentation are detailed and structured.
+
+The class includes several methods:
+
+1. **summary(self, document)**: This method generates a summary of a given document. It extracts the path and content from the document's metadata and page content, respectively. It then uses the model to invoke the example_prompt with the formatted content and path, returning the resulting summary.
+
+2. **generate_docs(self, contexts)**: This method generates documentation from a list of contexts. It joins the contexts with a separator and uses the model to invoke a documentation prompt (self.doc_prompt), returning the resulting documentation.
+
+3. **load_python_files(self, directory_path)**: This method recursively loads the content of all .py files in the specified directory and its subdirectories into LangChain documents. It uses a helper function, traverse_directory, to traverse the directory structure. For each valid file, it reads the content, creates a Document object, and stores the summary in the summaries dictionary.
+
+4. **load_data(self, url)**: This method creates rst doc files from folders. It retrieves the content from the summaries dictionary using the provided url, generates a unique doc_id using SHA-256 hashing, and returns a dictionary containing the doc_id and data.
+
+**Note**: Points to note about the use of the code
+- Ensure that the model used for generating summaries and documentation is properly configured and capable of handling the prompts.
+- The load_python_files method assumes that the directory structure and file contents are accessible and readable.
+
+**Output Example**: Mock up a possible appearance of the code's return value.
+```json
+{
+  "doc_id": "a1b2c3d4e5f6g7h8i9j0",
+  "data": [
+    {
+      "content": "Summary of the code file...",
+      "meta_data": {
+        "url": "path/to/file.py"
+      }
+    }
+  ]
+}
+```
 ### FunctionDef __init__(self, model, extensions, summaries)
  **__init__**: The function of __init__ is to initialize the CodeLoader object with specified parameters and set up default values for summaries and extensions.
 
@@ -59,7 +99,26 @@ Context 2: Details about the second section."
 ```
 ***
 ### FunctionDef load_python_files(self, directory_path)
-Doc is waiting to be generated...
+ **load_python_files**: The function of load_python_files is to recursively load the content of all .py files in a specified directory and its subdirectories into LangChain documents.
+
+**parameters**: The parameters of this Function.
+· directory_path: A string representing the path to the directory from which to start the search.
+
+**Code Description**: The description of this Function.
+The `load_python_files` function begins by defining an inner function `traverse_directory` that takes a single argument `path`. This inner function is responsible for traversing the directory structure starting from the given path.
+
+Within the `traverse_directory` function, the code iterates over each item in the directory specified by `path`. For each item, it constructs the full path (`item_path`) by joining the `path` and the item name. It then checks if the item is a directory or a file.
+
+If the item is a directory, the function calls itself recursively to continue the traversal. If the item is a file and its extension matches any of the extensions specified in `self.extensions` (which are not shown in the provided code but are assumed to include `.py`), the function opens the file in read mode with UTF-8 encoding.
+
+The content of the file is read into a variable `content`, and metadata is created with the source path of the file. If the content is not empty, a `Document` object is created with the content and metadata, and this document is summarized using the `self.summary` method (which is also not shown in the provided code). The summary is then stored in the `self.summaries` dictionary with the file path as the key.
+
+After defining the `traverse_directory` function, the `load_python_files` function calls this inner function with the `directory_path` parameter to initiate the directory traversal and loading process.
+
+**Note**: Points to note about the use of the code
+- Ensure that the `self.extensions` attribute includes the `.py` extension to correctly identify Python files.
+- The `self.summary` method must be defined to generate summaries of the loaded documents.
+- The function assumes that the directory and files can be accessed and read without permission issues.
 #### FunctionDef traverse_directory(path)
  **traverse_directory**: The function of traverse_directory is to recursively traverse a directory and summarize valid files based on specified extensions.
 
