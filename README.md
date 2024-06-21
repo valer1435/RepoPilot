@@ -27,4 +27,4 @@ Use fedot_example as a reference
 
 ## Documentation
 
-You can follow AI-generated [documentation](https://valeriis-organization.gitbook.io/repopilot-docs) genereted by [RepoAgent](https://github.com/OpenBMB/RepoAgent). Please note that it can hallucinate!
+You can follow AI-generated [documentation](https://valeriis-organization.gitbook.io/repopilot-docs) genereted by [RepoAgent](https://github.com/OpenBMB/RepoAgent). Please note that llm can hallucinate!
