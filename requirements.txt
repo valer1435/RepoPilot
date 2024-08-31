@@ -7,8 +7,11 @@ sentence-transformers
 faiss-cpu
 langchainhub
 langchain-openai
+
 embedchain
 streamlit
 python-dotenv
 sentence-transformers
 einops
+
+
