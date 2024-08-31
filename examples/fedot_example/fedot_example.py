@@ -1,4 +1,8 @@
-from repo_copilot.rag.rag import RAGApp
+from dotenv import load_dotenv
+
+from main import RepoPilot
+
+load_dotenv()
 
 
 class FedotDataSet:
@@ -33,7 +37,6 @@ class FedotDataSet:
                       ]
 
 
-rag_app = RAGApp('deepseek-chat', repo_description='Fedot automl framework')
-
-for link in FedotDataSet().links:
-    rag_app.add(link)
+bot = RepoPilot('config.yml')
+# bot.add_docs(FedotDataSet().links)
+bot.pool()
