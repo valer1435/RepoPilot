@@ -9,7 +9,7 @@ from starlette_context import context
 
 
 class IssueGithubProvider:
-    def __init__(self, issue_url: Optional[str] = None):
+    def __init__(self,  issue_url: Optional[str] = None):
         self.repo_obj = None
         try:
             self.installation_id = context.get("installation_id", None)
@@ -72,16 +72,6 @@ class IssueGithubProvider:
 
         notifications = self.github_client.get_user().get_notifications(since=since)
         return notifications
-
-    def get_repo_settings(self):
-        try:
-            # contents = self.repo_obj.get_contents(".pr_agent.toml", ref=self.pr.head.sha).decoded_content
-
-            # more logical to take 'pr_agent.toml' from the default branch
-            contents = self.repo_obj.get_contents(".pr_agent.toml").decoded_content
-            return contents
-        except Exception:
-            return ""
 
     def add_eyes_reaction(self, issue_comment_id: int, disable_eyes: bool = False) -> Optional[int]:
         if disable_eyes:

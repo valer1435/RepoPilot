@@ -37,6 +37,6 @@ class FedotDataSet:
                       ]
 
 
-bot = RepoPilot('config.yml')
+bot = RepoPilot(issue_config_path='config.yml', pr_config_path='pr_agent.toml')
 # bot.add_docs(FedotDataSet().links)
 bot.pool()

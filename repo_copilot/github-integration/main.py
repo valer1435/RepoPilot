@@ -1,18 +1,15 @@
 import asyncio
 import os
-from datetime import datetime, timezone
 
 import aiohttp
-from dotenv import load_dotenv
 from pr_agent.agent.pr_agent import PRAgent
 from pr_agent.config_loader import get_settings
-from pr_agent.git_providers import GithubProvider
 from pr_agent.log import LoggingFormat, get_logger, setup_logger
 
+from pr.PrGithubProvider import PrGithubProvider
 from repo_copilot.rag.issue.github_issue_provider import IssueGithubProvider
 from repo_copilot.rag.issue.issue_agent import IssueAgent
 from repo_copilot.rag.issue.rag_app.rag import RAGApp
-
 
 setup_logger(fmt=LoggingFormat.JSON, level="DEBUG")
 
@@ -20,12 +17,12 @@ setup_logger(fmt=LoggingFormat.JSON, level="DEBUG")
 class RepoPilot:
     NOTIFICATION_URL = "https://api.github.com/notifications"
 
-    def __init__(self, config_path: str):
+    def __init__(self, issue_config_path: str, pr_config_path: str):
         self._setup_pr_agent()
-        self.rag_app = self._setup_rag(config_path)
+        self.rag_app = self._setup_rag(issue_config_path)
         self.handled_ids = set()
         self.last_modified = [None]
-        self.pr_github_provider = GithubProvider()
+        self.pr_github_provider = PrGithubProvider(config_path=pr_config_path)
         self.issue_github_provider = IssueGithubProvider()
         self.user_id = self.pr_github_provider.get_user_id()
         self.user_tag = "@" + self.user_id
@@ -37,14 +34,14 @@ class RepoPilot:
         provider = "github"  # GitHub provider
         user_token = os.environ["GITHUB_TOKEN"]  # GitHub user token
         openai_key = os.environ['OPENAI_API_KEY']  # OpenAI key
-        #openai_base = os.environ['OPENAI_API_BASE']
-        #openai_model = 'openai/deepseek-chat'
+        # openai_base = os.environ['OPENAI_API_BASE']
+        # openai_model = 'openai/deepseek-chat'
 
         # Setting the configurations
         get_settings().set("CONFIG.git_provider", provider)
         get_settings().set("openai.key", openai_key)
-        #get_settings().set("openai.api_base", openai_base)
-        #get_settings().set("CONFIG.model", openai_model)
+        # get_settings().set("openai.api_base", openai_base)
+        # get_settings().set("CONFIG.model", openai_model)
         get_settings().set("github.user_token", user_token)
 
     def _setup_rag(self, config_path):
@@ -71,7 +68,7 @@ class RepoPilot:
                     if 'user' in comment else ''
                 get_logger().info(
                     f"Commenter: {commenter_github_user}\nComment: {comment_body}")
-                if self.user_tag not in comment_body:
+                if not comment_body or self.user_tag not in comment_body:
                     return None, None, None
                 comment_id = comment['id']
                 return comment_id, comment_body, commenter_github_user
