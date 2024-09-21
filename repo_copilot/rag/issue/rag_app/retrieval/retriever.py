@@ -16,29 +16,28 @@ class Retriever:
 
         client = QdrantClient(host="localhost", port=6333)
         aclient = AsyncQdrantClient(host="localhost", port=6333)
-        self.vector_store = QdrantVectorStore(
-            config['VectorStore']['name'],
-            client=client,
-            aclient=aclient,
-            enable_hybrid=True,
-            batch_size=20,
-        )
-        self.query_engine = VectorStoreIndex.from_vector_store(
-            vector_store=self.vector_store,
-            embed_model=self.embedding
-        ).as_query_engine(similarity_top_k=self.top_k,
-                          sparse_top_k=self.sparse_top_k,
-                          llm=model,
-                          embed_model=self.embedding)
 
-        self.query_tools = [
-            QueryEngineTool(
-                query_engine=self.query_engine,
+        self.query_tools = []
+        for store in config['VectorStore']:
+            vs = (QdrantVectorStore(
+                store['name'],
+                client=client,
+                aclient=aclient,
+                enable_hybrid=True,
+                batch_size=20))
+            query_engine = VectorStoreIndex.from_vector_store(
+                vector_store=vs,
+                embed_model=self.embedding
+            ).as_query_engine(similarity_top_k=self.top_k,
+                              sparse_top_k=self.sparse_top_k,
+                              llm=model,
+                              embed_model=self.embedding)
+            self.query_tools.append(QueryEngineTool(
+                query_engine=query_engine,
                 metadata=ToolMetadata(
-                    name="Documentation",
+                    name=store['agent_name'],
                     description=(
-                        "Used to provide general information, examples about framework"
+                        store["description"]
                     ),
                 )
-            )
-        ]
+            ))

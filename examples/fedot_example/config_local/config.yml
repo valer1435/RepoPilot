@@ -41,8 +41,8 @@ Retriever:
 LLMCaller:
   token_variable: 'OPENAI_API_KEY'
   llm:
-    model: 'deepseek-coder'
-    api_base: 'https://api.deepseek.com'
+    model: 'second-state/Mistral-Nemo-Instruct-2407-GGUF'
+    api_base: 'http://localhost:5001/v1'
     temperature: 0
 
   task_prompt: "You are Q&A system over open-source automl library Fedot. You are given with chat history of some issue in github repository.

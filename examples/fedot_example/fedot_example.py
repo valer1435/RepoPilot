@@ -35,8 +35,19 @@ class FedotDataSet:
                       "https://fedot.readthedocs.io/en/latest/api/repository.html",
                       "https://fedot.readthedocs.io/en/latest/api/transformations.html"
                       ]
+        self.owner = 'aimclub'
+        self.repo = 'FEDOT'
+        self.branch = 'master'
+        self.extensions = ['.py']
+        self.folders = ['fedot']
 
 
-bot = RepoPilot(issue_config_path='config.yml', pr_config_path='pr_agent.toml')
-# bot.add_docs(FedotDataSet().links)
+#bot = RepoPilot(issue_config_path='config.yml', pr_config_path='pr_agent.toml')
+# local llm
+bot = RepoPilot(issue_config_path='config_local/config.yml', pr_config_path='config_local/pr_agent.toml')
+fedot = FedotDataSet()
+
+# bot.add_docs_site('https://fedot.readthedocs.io/en/latest/index.html', 'fedot')
+# bot.add_codebase(fedot.owner, fedot.repo, fedot.branch, fedot.extensions, fedot.folders,  'fedot_code')
+
 bot.pool()

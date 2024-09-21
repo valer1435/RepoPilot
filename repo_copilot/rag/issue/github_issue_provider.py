@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from urllib.parse import urlparse
 
 from github import AppAuthentication, Auth, Github
@@ -33,7 +33,19 @@ class IssueGithubProvider:
         self.issue = self._get_issue()
         self.issue_comments = list(self.issue.get_comments())
 
-    def publish_comment(self, content: str):
+    def publish_comment(self, content: str, citations: Optional[List] = None):
+        if citations:
+            citation_message = ["\n\n**Please follow links below:**"]
+            for i, node in enumerate(citations, start=1):
+                if i > 5:
+                    break
+                if 'URL' in node.metadata:
+                    citation_message.append(f"{i}. [{node.text.strip('\n').split('\n', 1)[0]}]({node.metadata['URL']})")
+                if 'url' in node.metadata:
+                    citation_message.append(
+                        f"{i}. [{node.metadata['file_name']}]({node.metadata['url']})")
+            citation_message = '\n'.join(citation_message)
+            content = content+citation_message
         response = self.issue.create_comment(content)
         return response
 
