@@ -44,7 +44,7 @@ class FedotDataSet:
 
 #bot = RepoPilot(issue_config_path='config.yml', pr_config_path='pr_agent.toml')
 # local llm
-bot = RepoPilot(issue_config_path='config_local/config.yml', pr_config_path='config_local/pr_agent.toml')
+bot = RepoPilot(issue_config_path='config_local/config.yml', pr_config_path='pr_agent.toml')
 fedot = FedotDataSet()
 
 # bot.add_docs_site('https://fedot.readthedocs.io/en/latest/index.html', 'fedot')

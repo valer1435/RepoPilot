@@ -4,6 +4,11 @@ enable_auto_approval = false
 
 [config]
 custom_model_max_tokens=8000
+
 model="openai/second-state/Mistral-Nemo-Instruct-2407-GGUF"
 model_turbo="openai/second-state/Mistral-Nemo-Instruct-2407-GGUF"
 fallback_models=["openai/second-state/Mistral-Nemo-Instruct-2407-GGUF"]
+[openai]
+api_base="http://localhost:5001/v1/"
+[litellm]
+set_verbose = true
