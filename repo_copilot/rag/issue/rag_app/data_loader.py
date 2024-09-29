@@ -45,10 +45,12 @@ class DataLoader:
 
     def load_html(self, links, collection_name):
         loader = BeautifulSoupWebReader()
-        documents = loader.load_data(urls=links)
-        # Ingest directly into a vector db
-        self.vector_stores[collection_name]['pipeline'].run(documents=documents,
-                                                            show_progress=True)
+        try:
+            documents = loader.load_data(urls=links)
+            # Ingest directly into a vector db
+            self.vector_stores[collection_name]['pipeline'].run(documents=documents, show_progress = True)
+        except Exception as e:
+            print(f"Error loading HTML from links: {e}")
 
     def load_site(self, address, collection_name):
         pages = get_all_pages(address)

@@ -15,6 +15,9 @@ class Reranker:
         # construct sentence pairs
         sentence_pairs = [[query, doc.node.text] for doc in chunks]
         scores = self.model.compute_score(sentence_pairs, max_length=1024)
+        min_score = min(scores)
+        max_score = max(scores)
+        normalized_scores = [(score - min_score) / (max_score - min_score) for score in scores]
         for i in range(len(chunks)):
-            chunks[i].score = scores[i]
+            chunks[i].score = normalized_scores[i]
         return sorted(chunks, key=lambda x: -x.score)[:self.top_k]
