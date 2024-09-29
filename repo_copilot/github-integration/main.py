@@ -27,8 +27,8 @@ class RepoPilot:
         self.rag_app = self._setup_rag(issue_config_path)
         self.handled_ids = set()
         pr_agent.git_providers._GIT_PROVIDERS['custom_github'] = partial(PrGithubProvider, config_path=pr_config_path)
+        self.pr_config_path = pr_config_path
         self.pr_github_provider = PrGithubProvider(config_path=pr_config_path)
-        self.issue_github_provider = IssueGithubProvider()
         self.user_id = self.pr_github_provider.get_user_id()
         self.user_tag = "@" + self.user_id
         self.pr_agent = PRAgent()
@@ -38,6 +38,12 @@ class RepoPilot:
         self.working_repo_owner = config['RepoSettings']['owner']
         self.working_repo_name = config['RepoSettings']['name']
         self.last_time = datetime.utcnow().isoformat(timespec='seconds') + 'Z'
+
+    def _get_issue_provider(self):
+        return IssueGithubProvider()
+
+    def _get_pr_provider(self):
+        return PrGithubProvider(config_path=self.pr_config_path)
 
     def _setup_pr_agent(self):
         provider = "custom_github"  # Override provider
@@ -60,7 +66,7 @@ class RepoPilot:
     def add_codebase(self, owner: str, repo: str, branch: str, extensions, folders, collection_name):
         self.rag_app.add_code_base(owner, repo, branch, extensions, folders, collection_name)
 
-    async def _parse_comment(self, notification, session, headers):
+    async def _parse_comment(self, provider, notification, session, headers):
         latest_comment = notification['subject']['latest_comment_url']
         async with session.get(latest_comment, headers=headers) as comment_response:
             if comment_response.status == 200:
@@ -75,7 +81,8 @@ class RepoPilot:
                 get_logger().info(
                     f"Commenter: {commenter_github_user}\nComment: {comment_body}")
                 if not comment_body or self.user_tag not in comment_body:
-                    if len(self.issue_github_provider.issue_comments) == 0 and comment['state'] == 'open':
+                    if notification['subject']['type'] == 'Issue' and len(provider.issue_comments) == 0 and comment[
+                        'state'] == 'open':
                         return comment_id, "__init__", commenter_github_user
                     else:
                         return None, None, None
@@ -85,22 +92,27 @@ class RepoPilot:
 
     async def handle_pr(self, notification, session, headers):
         pr_url = notification['subject']['url']
-        comment_id, comment_body, commenter_github_user = await self._parse_comment(notification, session, headers)
+        provider = self._get_pr_provider()
+        provider.set_pr(pr_url)
+        comment_id, comment_body, commenter_github_user = await self._parse_comment(provider, notification, session,
+                                                                                    headers)
         if not comment_body:
             return False
         rest_of_comment = comment_body.split(self.user_tag)[1].strip()
-        self.pr_github_provider.set_pr(pr_url)
+
         success = await self.pr_agent.handle_request(pr_url, rest_of_comment,
-                                                     notify=lambda: self.pr_github_provider.add_eyes_reaction(
+                                                     notify=lambda: provider.add_eyes_reaction(
                                                          comment_id))  # noqa E501
         if not success:
-            self.pr_github_provider.set_pr(pr_url)
+            provider.set_pr(pr_url)
         return True
 
     async def handle_issue(self, notification, session, headers):
         issue_url = notification['subject']['url']
-        self.issue_github_provider.set_issue(issue_url)
-        comment_id, comment_body, commenter_github_user = await self._parse_comment(notification, session, headers)
+        provider = self._get_issue_provider()
+        provider.set_issue(issue_url)
+        comment_id, comment_body, commenter_github_user = await self._parse_comment(provider, notification, session,
+                                                                                    headers)
         if not comment_body:
             return False
         if comment_body == '__init__':
@@ -111,11 +123,11 @@ Hello there! I'm here to assist you with any questions.
 Please feel free to share your thoughts, and I'll do my best to provide you with the information or support you need. Let's work together to resolve any issues and make things better!
 
 Looking forward to your input! 🌟. To ask me just tag {self.user_tag}"""
-            self.issue_github_provider.publish_comment(content)
+            provider.publish_comment(content)
             return True
 
         success = await self.issue_agent.handle_request(issue_url,
-                                                        notify=lambda: self.issue_github_provider.add_eyes_reaction(
+                                                        notify=lambda: provider.add_eyes_reaction(
                                                             comment_id))  # noqa E501
         return success
 

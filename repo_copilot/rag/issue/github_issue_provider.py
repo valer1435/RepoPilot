@@ -177,7 +177,9 @@ class IssueGithubProvider:
 
     def get_issue_as_prompt(self):
         all_comments = ['There is a chat in github issue. ']
-        all_comments.append(f'Author: {self.issue.user.login}\nContent:\n{self.issue.body}')
+        if self.issue and self.issue.body:
+            all_comments.append(f'Author: {self.issue.user.login}\nContent:\n{self.issue.body}')
         for i in self.issue_comments:
-            all_comments.append(f'Author: {i.user.login}\nContent:\n{i.body}')
+            if i and i.body:
+                all_comments.append(f'Author: {i.user.login}\nContent:\n{i.body}')
         return '\n\n'.join(all_comments)
