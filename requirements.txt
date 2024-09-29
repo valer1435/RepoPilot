@@ -1,3 +1,4 @@
+pr_agent
 langchain
 transformers
 huggingface_hub
@@ -11,4 +12,6 @@ embedchain
 streamlit
 python-dotenv
 sentence-transformers
-FlagEmbedding
+einops
+
+

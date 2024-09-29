@@ -1,4 +1,8 @@
-from repo_copilot.rag.rag import RAGApp
+from dotenv import load_dotenv
+
+from main import RepoPilot
+
+load_dotenv()
 
 
 class FedotDataSet:
@@ -31,9 +35,19 @@ class FedotDataSet:
                       "https://fedot.readthedocs.io/en/latest/api/repository.html",
                       "https://fedot.readthedocs.io/en/latest/api/transformations.html"
                       ]
+        self.owner = 'aimclub'
+        self.repo = 'FEDOT'
+        self.branch = 'master'
+        self.extensions = ['.py']
+        self.folders = ['fedot']
 
 
-rag_app = RAGApp('deepseek-chat', repo_description='Fedot automl framework')
+#bot = RepoPilot(issue_config_path='config.yml', pr_config_path='pr_agent.toml')
+# local llm
+bot = RepoPilot(issue_config_path='config_local/config.yml', pr_config_path='pr_agent.toml')
+fedot = FedotDataSet()
 
-for link in FedotDataSet().links:
-    rag_app.add(link)
+# bot.add_docs_site('https://fedot.readthedocs.io/en/latest/index.html', 'fedot')
+# bot.add_codebase(fedot.owner, fedot.repo, fedot.branch, fedot.extensions, fedot.folders,  'fedot_code')
+
+bot.pool()
