@@ -19,23 +19,29 @@ class RAGApp:
         self.data_loader = DataLoader(self.config)
         self.preprocessor = Preprocessor(self.config['Preprocessor'])
         self.retriever = Retriever(self.config, self.model)
+        if self.data_loader.enabled:
+            self.add_site()
+            self.add_code_base()
 
     def add_links(self, links, collection_name):
         self.data_loader.load_html(links, collection_name)
 
-    def add_site(self, url, collection_name):
-        self.data_loader.load_site(url, collection_name)
+    def add_site(self):
+        self.data_loader.load_site()
 
-    def add_code_base(self, owner, repo, branch, extensions, folders, collection_name):
-        self.data_loader.load_code(owner, repo, branch, extensions, folders, collection_name)
+    def add_code_base(self):
+        self.data_loader.load_code()
 
     async def query(self, question, citations=False):
         processed_query = self.preprocessor.preprocess(question)
-        agent = ReActAgent.from_tools(self.retriever.query_tools,
-                                      llm=self.model,
-                                      max_iterations=15,
-                                      verbose=True)
-        response = await agent.achat(processed_query)
+        try:
+            agent = ReActAgent.from_tools(self.retriever.query_tools,
+                                          llm=self.model,
+                                          max_iterations=5,
+                                          verbose=True)
+            response = await agent.achat(processed_query)
+        except ValueError as e:
+            return "Sorry, I'm unable answer your question with information I have.", []
         if citations:
             return response.response, response.source_nodes
         else:

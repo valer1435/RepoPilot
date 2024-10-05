@@ -1,0 +1,9 @@
+[pr_reviewer]
+enable_review_labels_effort = true
+enable_auto_approval = false
+
+[config]
+custom_model_max_tokens=32000
+model="deepseek/deepseek-chat"
+model_turbo="deepseek/deepseek-chat"
+fallback_models=["deepseek/deepseek-chat"]

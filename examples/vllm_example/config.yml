@@ -3,26 +3,28 @@ RepoSettings:
   name: RepoPilot
 
 DataLoader:
+  enable: True
   docs:
-    collection_name: "fedot"
-    site: "https://fedot.readthedocs.io/en/latest/"
+    collection_name: "vllm"
+    site: "https://docs.vllm.ai/en/latest/"
+    extensions: ["/", '.html']
   code:
-    collection_name: "fedot_code"
-    repo_owner: "aimclub"
-    repo_name: "fedot"
-    branch: "master"
+    collection_name: "vllm_code"
+    repo_owner: "vllm-project"
+    repo_name: "vllm"
+    branch: "main"
     extensions: [".py"]
-    folders: ["fedot"]
+    folders: ["vllm"]
 
 VectorStore:
-    - name: 'fedot'
+    - name: 'vllm'
       emb_dim: 1024
       agent_name: 'Documentation'
       description: 'Used to provide general information, examples about framework'
-    - name: 'fedot_code'
+    - name: 'vllm_code'
       emb_dim: 1024
       agent_name: 'CodeBase'
-      description: 'Used to provide source code of Fedot framework. May be useful in questions about classes and 
+      description: 'Used to provide source code of VLLM framework. May be useful in questions about classes and 
       functions inside framework'
 Embedding:
   provider: 'huggingface'
