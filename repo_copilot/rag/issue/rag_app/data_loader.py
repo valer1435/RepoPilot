@@ -12,8 +12,7 @@ from llama_index.readers.web import BeautifulSoupWebReader
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import AsyncQdrantClient, QdrantClient
 
-from embedding_factory import EmbeddingModelFactory
-
+from repo_copilot.rag.issue.rag_app.retrieval.embedding.embedding_factory import EmbeddingModelFactory
 
 class DataLoader:
     def __init__(self, config):
@@ -26,7 +25,7 @@ class DataLoader:
             github_token=os.environ["GITHUB_TOKEN"],
             verbose=True)
         self.vector_stores = {}
-        for store in config['VectorStore']:
+        for store in config['VectorStore']['collections']:
             vs = (QdrantVectorStore(
                 store['name'],
                 client=client,
@@ -44,7 +43,7 @@ class DataLoader:
             self.vector_stores[store['name']] = {'vector_store': vs, 'pipeline': pipeline}
 
         for key in config['DataLoader']:
-            if key == 'enabled':
+            if key == 'enable':
                 self.enabled = config['DataLoader'][key]
             if key == 'docs':
                 self.doc_collection = config['DataLoader'][key]['collection_name']

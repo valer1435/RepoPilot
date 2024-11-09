@@ -11,8 +11,7 @@ from aiohttp import ClientTimeout
 from pr_agent.agent.pr_agent import PRAgent
 from pr_agent.config_loader import get_settings
 from pr_agent.log import LoggingFormat, get_logger, setup_logger
-
-from pr.PrGithubProvider import PrGithubProvider
+from repo_copilot.rag.pr.PrGithubProvider import PrGithubProvider
 from repo_copilot.rag.issue.github_issue_provider import IssueGithubProvider
 from repo_copilot.rag.issue.issue_agent import IssueAgent
 from repo_copilot.rag.issue.rag_app.rag import RAGApp

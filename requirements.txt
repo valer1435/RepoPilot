@@ -1,17 +1,16 @@
-pr_agent
-langchain
-transformers
-huggingface_hub
-unstructured[local-inference]
-sentence-transformers
-faiss-cpu
-langchainhub
-langchain-openai
-
-embedchain
-streamlit
-python-dotenv
-sentence-transformers
-einops
+pr_agent==0.2.4
+transformers==4.44.0
+fastembed==0.3.4
+huggingface_hub==0.24.5
+unstructured[local-inference]==0.15.5
+sentence-transformers==3.0.1
+python-dotenv==1.0.1
+einops==0.8.0
+llama-index==0.11.3
+llama-index-llms-openai-like==0.2.0
+llama-index-readers-github==0.2.0
+llama-index-readers-web==0.2.2
+llama-index-vector-stores-qdrant==0.3.0
+llama-index-embeddings-huggingface==0.3.1
 
 

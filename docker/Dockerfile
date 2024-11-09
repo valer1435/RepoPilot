@@ -3,12 +3,7 @@ WORKDIR /usr/local/app
 
 # Install the application dependencies
 COPY requirements.txt ./
-COPY repo_copilot ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY setup.py ./
+COPY repo_copilot ./repo_copilot
+RUN pip install -r requirements.txt
 RUN pip install -e .
-
-# Setup an app user so the container doesn't run as the root user
-RUN useradd app
-USER app
-
-CMD []

@@ -3,9 +3,11 @@ RepoSettings:
   name: RepoPilot
 
 DataLoader:
+  enable: False
   docs:
     collection_name: "fedot"
     site: "https://fedot.readthedocs.io/en/latest/"
+    extensions: ["/", '.html']
   code:
     collection_name: "fedot_code"
     repo_owner: "aimclub"
@@ -15,6 +17,9 @@ DataLoader:
     folders: ["fedot"]
 
 VectorStore:
+  host: "localhost"
+  port: 6333
+  collections:
     - name: 'fedot'
       emb_dim: 1024
       agent_name: 'Documentation'
@@ -22,14 +27,13 @@ VectorStore:
     - name: 'fedot_code'
       emb_dim: 1024
       agent_name: 'CodeBase'
-      description: 'Used to provide source code of Fedot framework. May be useful in questions about classes and 
-      functions inside framework'
+      description: 'Used to provide source code of Fedot framework.'
 Embedding:
   provider: 'huggingface'
   config:
     model_name: 'WhereIsAI/UAE-Large-V1'
     trust_remote_code: true
-    device: 'cuda'
+    device: 'cpu'
 Preprocessor:
 Retriever:
   top_k: 5

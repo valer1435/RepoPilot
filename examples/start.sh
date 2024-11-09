@@ -1,0 +1,1 @@
+docker run --net=host -it -v E:\programming\RepoCopilot\examples\fedot_example:/usr/local/app/example valer1435/repo_copilot-cpu bash

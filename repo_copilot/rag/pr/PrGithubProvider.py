@@ -5,8 +5,8 @@ from pr_agent.git_providers.git_provider import IncrementalPR
 
 
 class PrGithubProvider(GithubProvider):
-    def __init__(self, pr_url: Optional[str] = None, incremental=IncrementalPR(False), config_path: Optional[str] = ""):
-        super().__init__(pr_url, incremental=incremental)
+    def __init__(self, pr_url: Optional[str] = None, config_path: Optional[str] = ""):
+        super().__init__(pr_url)
         self.config_path = config_path
 
     def get_repo_settings(self):

@@ -3,7 +3,7 @@ RepoSettings:
   name: RepoPilot
 
 DataLoader:
-  enable: True
+  enable: False
   docs:
     collection_name: "vllm"
     site: "https://docs.vllm.ai/en/latest/"
@@ -17,6 +17,9 @@ DataLoader:
     folders: ["vllm"]
 
 VectorStore:
+  host: "localhost"
+  port: 6333
+  collections:
     - name: 'vllm'
       emb_dim: 1024
       agent_name: 'Documentation'
