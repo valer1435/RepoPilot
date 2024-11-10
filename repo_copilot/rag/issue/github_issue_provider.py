@@ -9,7 +9,7 @@ from starlette_context import context
 
 
 class IssueGithubProvider:
-    def __init__(self,  issue_url: Optional[str] = None):
+    def __init__(self, issue_url: Optional[str] = None):
         self.repo_obj = None
         try:
             self.installation_id = context.get("installation_id", None)
@@ -40,12 +40,13 @@ class IssueGithubProvider:
                 if i > 5:
                     break
                 if 'URL' in node.metadata:
-                    citation_message.append(f"{i}. [{node.text.strip('\n').split('\n', 1)[0]}]({node.metadata['URL']})")
+                    alias = node.text.strip('\n').split('\n', 1)[0]
+                    citation_message.append(f"{i}. [{alias}]({node.metadata['URL']})")
                 if 'url' in node.metadata:
                     citation_message.append(
                         f"{i}. [{node.metadata['file_name']}]({node.metadata['url']})")
             citation_message = '\n'.join(citation_message)
-            content = content+citation_message
+            content = content + citation_message
         response = self.issue.create_comment(content)
         return response
 
@@ -176,10 +177,12 @@ class IssueGithubProvider:
         return self._get_repo().get_issue(self.issue_num)
 
     def get_issue_as_prompt(self):
-        all_comments = ['There is a chat in github issue. ']
+        all_comments = ['There is a chat in github issue: ']
         if self.issue and self.issue.body:
             all_comments.append(f'Author: {self.issue.user.login}\nContent:\n{self.issue.body}')
         for i in self.issue_comments:
             if i and i.body:
                 all_comments.append(f'Author: {i.user.login}\nContent:\n{i.body}')
+        all_comments.append(
+            'Please find the last relevant question and provide answer on it. Do not consider unrelevant messaages, but consider previous dialogue')
         return '\n\n'.join(all_comments)

@@ -2,6 +2,7 @@ import asyncio
 import os
 from datetime import datetime
 from functools import partial
+from typing import Optional
 
 import aiohttp
 import pr_agent.git_providers
@@ -10,8 +11,7 @@ from aiohttp import ClientTimeout
 from pr_agent.agent.pr_agent import PRAgent
 from pr_agent.config_loader import get_settings
 from pr_agent.log import LoggingFormat, get_logger, setup_logger
-
-from pr.PrGithubProvider import PrGithubProvider
+from repo_copilot.rag.pr.PrGithubProvider import PrGithubProvider
 from repo_copilot.rag.issue.github_issue_provider import IssueGithubProvider
 from repo_copilot.rag.issue.issue_agent import IssueAgent
 from repo_copilot.rag.issue.rag_app.rag import RAGApp
@@ -22,17 +22,17 @@ setup_logger(fmt=LoggingFormat.JSON, level="DEBUG")
 class RepoPilot:
     NOTIFICATION_URL = "https://api.github.com/repos/{owner}/{repo}/notifications"
 
-    def __init__(self, issue_config_path: str, pr_config_path: str):
+    def __init__(self, issue_config_path: str, pr_config_path: Optional[str] = None):
+        pr_agent.git_providers._GIT_PROVIDERS['custom_github'] = partial(PrGithubProvider, config_path=pr_config_path)
+        self.handled_ids = set()
+        self.pr_config_path = pr_config_path
         self._setup_pr_agent()
         self.rag_app = self._setup_rag(issue_config_path)
-        self.handled_ids = set()
-        pr_agent.git_providers._GIT_PROVIDERS['custom_github'] = partial(PrGithubProvider, config_path=pr_config_path)
-        self.pr_config_path = pr_config_path
-        self.pr_github_provider = PrGithubProvider(config_path=pr_config_path)
-        self.user_id = self.pr_github_provider.get_user_id()
+        self.issue_agent = IssueAgent(self.rag_app)
+        self.user_id = self._get_issue_provider().get_user_id()
         self.user_tag = "@" + self.user_id
         self.pr_agent = PRAgent()
-        self.issue_agent = IssueAgent(self.rag_app)
+
         with open(issue_config_path) as fh:
             config = yaml.load(fh, Loader=yaml.FullLoader)
         self.working_repo_owner = config['RepoSettings']['owner']
@@ -57,14 +57,14 @@ class RepoPilot:
     def _setup_rag(self, config_path):
         return RAGApp(config_path)
 
-    def add_docs_site(self, url: str, collection_name: str):
-        self.rag_app.add_site(url, collection_name)
+    def add_docs_site(self):
+        self.rag_app.add_site()
 
-    def add_docs_pages(self, docs_links: list[str], collection_name: str):
-        self.rag_app.add_links(docs_links, collection_name)
+    def add_docs_pages(self, links, collection_name):
+        self.rag_app.add_links(links, collection_name)
 
-    def add_codebase(self, owner: str, repo: str, branch: str, extensions, folders, collection_name):
-        self.rag_app.add_code_base(owner, repo, branch, extensions, folders, collection_name)
+    def add_codebase(self):
+        self.rag_app.add_code_base()
 
     async def _parse_comment(self, provider, notification, session, headers):
         latest_comment = notification['subject']['latest_comment_url']
@@ -184,7 +184,8 @@ Looking forward to your input! 🌟. To ask me just tag {self.user_tag}"""
                     if 'reason' in notification and notification['reason'] in ['mention', 'subscribed']:
                         if 'subject' in notification:
                             if notification['subject']['type'] == 'PullRequest':
-                                await self.handle_pr(notification, session, headers)
+                                if self.pr_config_path:
+                                    await self.handle_pr(notification, session, headers)
                                 self.last_time = datetime.utcnow().isoformat(timespec='seconds') + 'Z'
                             elif notification['subject']['type'] == 'Issue':
                                 await self.handle_issue(notification, session, headers)

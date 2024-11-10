@@ -1,4 +1,3 @@
-import shlex
 from functools import partial
 
 from pr_agent.algo.ai_handlers.base_ai_handler import BaseAiHandler

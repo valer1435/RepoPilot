@@ -33,7 +33,7 @@ class IssueQuestions:
                             'config': dict(get_settings().config)}
         get_logger().debug("Relevant configs", artifacts=relevant_configs)
 
-        response, citations = await self.rag_engine.query(self.git_provider.get_issue_as_prompt(), citations=True)
+        response, citations = await self.rag_engine.aquery(self.git_provider.get_issue_as_prompt(), citations=True)
         if get_settings().config.publish_output:
             self.git_provider.publish_comment(response, citations)
 
