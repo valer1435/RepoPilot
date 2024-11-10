@@ -33,11 +33,11 @@ Open-source AI-powered tool for smart repository maintainance
     GITHUB_TOKEN=<<github token>>
     ```
 5. #### If GPU is available:
-   Run `docker run --net=host --gpus all -it -v /path/to/folder/with/startup/script:/usr/local/app/example valer1435/repo_copilot bash`
+   Run `docker run --net=host --gpus all -it -v /path/to/folder/with/startup/script:/usr/local/app/example valer1435/repo_pilot bash`
    
    Then in the container run `cd /usr/local/app/example && python start.py`
 6. #### If GPU is  NOT available:
-   Run `docker run --net=host -it -v /path/to/folder/with/startup/script:/usr/local/app/example valer1435/repo_copilot bash`
+   Run `docker run --net=host -it -v /path/to/folder/with/startup/script:/usr/local/app/example valer1435/repo_pilot bash`
    
    Then in the container run `cd /usr/local/app/example && python start.py`
 
@@ -46,7 +46,7 @@ Run
 ```bash
 git clone https://github.com/valer1435/RepoPilot.git
 cd RepoPilot
-docker build -f docker/Dockerfile -t valer1435/repo_copilot .
+docker build -f docker/Dockerfile -t valer1435/repo_pilot:0.0.1 .
 ```
 
 ### Option 3 (no docker)

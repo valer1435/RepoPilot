@@ -1,7 +1,6 @@
 from typing import Optional
 
 from pr_agent.git_providers import GithubProvider
-from pr_agent.git_providers.git_provider import IncrementalPR
 
 
 class PrGithubProvider(GithubProvider):

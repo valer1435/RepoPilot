@@ -1,7 +1,6 @@
 import os
 
 import yaml
-from llama_index.core.agent import ReActAgent
 from llama_index.llms.openai_like import OpenAILike
 
 from repo_copilot.rag.issue.rag_app.data_loader import DataLoader
